@@ -42,6 +42,7 @@
 import os
 import torch
 import numpy as np
+import cv2
 import matplotlib.pyplot as plt
 from src.common import cam_pose_to_matrix
 
@@ -68,6 +69,31 @@ class Frame_Visualizer(object):
         self.inside_freq = inside_freq
         self.truncation = truncation
         os.makedirs(f'{vis_dir}', exist_ok=True)
+
+    def save_renders(self, idx, gt_depth, c2w_or_camera_tensor, all_planes, decoders):
+        """
+        Visualization of depth and color images and save to file.
+        Args:
+            idx (int): current frame index.
+            iter (int): the iteration number.
+            gt_depth (tensor): ground truth depth image of the current frame.
+            gt_color (tensor): ground truth color image of the current frame.
+            c2w_or_camera_tensor (tensor): camera pose, represented in 
+                camera to world matrix or quaternion and translation tensor.
+            all_planes (Tuple): feature planes.
+            decoders (torch.nn.Module): decoders for TSDF and color.
+        """
+        with torch.no_grad():
+
+            if c2w_or_camera_tensor.shape[-1] > 4: ## 6od
+                c2w = cam_pose_to_matrix(c2w_or_camera_tensor.clone().detach()).squeeze()
+            else:
+                c2w = c2w_or_camera_tensor.squeeze().detach()
+
+            _, color = self.renderer.render_img(all_planes, decoders, c2w, self.truncation,
+                                                    self.device, gt_depth=gt_depth)
+            torch.save(color, f'{self.vis_dir}/{idx:05d}_color.pt')
+
 
     def save_imgs(self, idx, iter, gt_depth, gt_color, c2w_or_camera_tensor, all_planes, decoders):
         """

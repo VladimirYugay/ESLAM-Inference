@@ -331,3 +331,15 @@ class Tracker(object):
             self.gt_c2w_list[idx] = gt_c2w.squeeze(0).clone()
             pre_c2w = c2w.clone()
             self.idx[0] = idx
+
+            if idx == self.n_img - 1:
+                print("Saving renders of the images!")
+                pbar = self.frame_loader
+                for idxt, gt_color, gt_depth, gt_c2w in pbar:
+                    idxt = idxt[0]
+                    gt_deptht = gt_depth.to(self.device, non_blocking=True)
+
+                    cur_c2wt = self.estimate_c2w_list[idx]
+                    cur_c2wt = gt_c2w.to(self.device, non_blocking=True)
+                    if idxt % 5 == 0:
+                        self.visualizer.save_renders(idxt, gt_deptht, cur_c2wt.squeeze(), all_planes, self.decoders)
