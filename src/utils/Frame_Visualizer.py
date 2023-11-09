@@ -70,7 +70,7 @@ class Frame_Visualizer(object):
         self.truncation = truncation
         os.makedirs(f'{vis_dir}', exist_ok=True)
 
-    def save_renders(self, idx, gt_depth, c2w_or_camera_tensor, all_planes, decoders):
+    def save_renders(self, idx, gt_color, gt_depth, c2w_or_camera_tensor, all_planes, decoders):
         """
         Visualization of depth and color images and save to file.
         Args:
@@ -93,6 +93,7 @@ class Frame_Visualizer(object):
             _, color = self.renderer.render_img(all_planes, decoders, c2w, self.truncation,
                                                     self.device, gt_depth=gt_depth)
             torch.save(color, f'{self.vis_dir}/{idx:05d}_color.pt')
+            torch.save(gt_color, f'{self.vis_dir}/{idx:05d}_gt_color.pt')
 
 
     def save_imgs(self, idx, iter, gt_depth, gt_color, c2w_or_camera_tensor, all_planes, decoders):

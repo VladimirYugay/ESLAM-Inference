@@ -337,9 +337,10 @@ class Tracker(object):
                 pbar = self.frame_loader
                 for idxt, gt_color, gt_depth, gt_c2w in pbar:
                     idxt = idxt[0]
-                    gt_deptht = gt_depth.to(self.device, non_blocking=True)
+                    gt_color = gt_color.to(self.device, non_blocking=True)
+                    gt_depth = gt_depth.to(self.device, non_blocking=True)
 
                     cur_c2wt = self.estimate_c2w_list[idx]
                     cur_c2wt = gt_c2w.to(self.device, non_blocking=True)
                     if idxt % 5 == 0:
-                        self.visualizer.save_renders(idxt, gt_deptht, cur_c2wt.squeeze(), all_planes, self.decoders)
+                        self.visualizer.save_renders(idxt, gt_color, gt_depth, cur_c2wt.squeeze(), all_planes, self.decoders)
